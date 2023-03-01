@@ -1,5 +1,8 @@
 Rails.application.routes.draw do
   post "/create", to: "users#create"
+  post "/login", to: "users#login"
+  post "/otp_check", to: "users#otp_check"
+
   # post "/login", to: "users#login"
   # post "/update_kyc", to: "users#update_kyc"
 

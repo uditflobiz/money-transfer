@@ -4,11 +4,12 @@ class User < ApplicationRecord
   has_one_time_password
 
   validates :name, presence: true
-  validates :email, presence: true, format: { with: URI::MailTo::EMAIL_REGEXP, message: "incorrect email" }
+  validates :phone_number, presence: true, uniqueness: true
+  validates :email, presence: true, format: { with: URI::MailTo::EMAIL_REGEXP, message: "Incorrect email" }, uniqueness: true
   validates :password_digest, presence: true
 
   before_update :prevent_updation
-  after_update :create_wallet
+  # after_update :create_wallet
 
 
   def prevent_updation
@@ -17,9 +18,9 @@ class User < ApplicationRecord
     end
   end
 
-  def create_wallet
-    if self.kyc_completed
-      #create wallet api
-    end
-  end
+  # def create_wallet
+  #   if self.kyc_completed
+  #     #create wallet api
+  #   end
+  # end
 end

@@ -4,11 +4,15 @@ class Users < ActiveRecord::Migration[6.0]
       t.string :name
       t.string :email
       t.string :password_digest
-      t.string :aadhaar_number, unique: true
+      t.string :phone_number
+      t.string :aadhaar_number
       t.string :aadhaar_url
       t.boolean :kyc_completed
       t.string :otp_secret_key
       t.timestamp :deleted_at
+      
+      t.index :phone_number, unique: true
+      t.index :aadhaar_number, unique: true
 
       t.timestamps
     end
