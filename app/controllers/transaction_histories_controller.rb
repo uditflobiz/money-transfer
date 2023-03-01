@@ -1,0 +1,2 @@
+class TransactionHistoriesController < ApplicationController
+end
