@@ -8,19 +8,12 @@ class User < ApplicationRecord
   validates :email, presence: true, format: { with: URI::MailTo::EMAIL_REGEXP, message: "Incorrect email" }, uniqueness: true
   validates :password_digest, presence: true
 
-  before_update :prevent_updation
-  # after_update :create_wallet
+  # before_update :prevent_updation
 
-
-  def prevent_updation
-    if self.kyc_completed
-      raise('KYC completed, cannot modify user')
-    end
-  end
-
-  # def create_wallet
-  #   if self.kyc_completed
-  #     #create wallet api
+  # def prevent_updation
+  #   puts(self.kyc_completed_change)
+  #   if !self.kyc_completed_change
+  #     raise('KYC completed, cannot modify user')
   #   end
   # end
 end

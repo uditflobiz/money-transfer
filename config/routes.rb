@@ -1,11 +1,10 @@
 Rails.application.routes.draw do
   post "/create", to: "users#create"
   post "/login", to: "users#login"
-  post "/otp_check", to: "users#otp_check"
+  post "/login_2FA", to: "users#login_2FA"
+  post "/top_up", to: "users#top_up"
+  post "/transfer_money", to: "users#transfer_money"
 
-  # post "/login", to: "users#login"
   # post "/update_kyc", to: "users#update_kyc"
-
-  # post "/transfer_money", to: "transaction_history#transfer_money"
   # get "/transaction_history", to: "transaction_history#transaction_history"
 end

@@ -10,7 +10,7 @@ class TransactionHistory < ApplicationRecord
   validates :receiver_wallet_id, presence: true
   validates :amount_debited, presence: true, if: Proc.new { |t| t.wallet_top_up == false }
   validates :amount_credited, presence: true
-  validates :transaction_fee, presence: true, if: Proc.new { |t| t.wallet_top_up == false && (t.sender_wallet.user_id != t.receiver_wallet.user_id)}
+  validates :transaction_fee, presence: true
 
   def prevent_deletion
     raise ("transaction history cannot be destroyed")
