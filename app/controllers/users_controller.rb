@@ -1,6 +1,11 @@
 class UsersController < ApplicationController
   before_action :authorized, only: [:login_2FA, :upload_kyc_docs]
 
+  def temp
+    user = User.find(params[:id])
+    render json: user
+  end
+
   def create
     user = User.new(create_user_params)
     begin

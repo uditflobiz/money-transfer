@@ -9,4 +9,7 @@ Rails.application.routes.draw do
   post "/transfer_money", to: "wallets#transfer_money"
 
   get "/user_transaction_history", to: "transaction_histories#get_transaction_history"
+
+  #test
+  get "/temp", to: "users#temp"
 end

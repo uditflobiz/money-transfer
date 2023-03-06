@@ -1,6 +1,8 @@
 class ApplicationController < ActionController::API
   # before_action :authorized
 
+  include ErrorHandler
+  
   def encode_token(payload)
     JWT.encode payload, 'my$ecretK3y', 'HS256'
   end
