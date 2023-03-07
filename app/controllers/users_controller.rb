@@ -1,51 +1,51 @@
 class UsersController < ApplicationController
-  before_action :authorized, only: [:login_2FA, :upload_kyc_docs]
+  # before_action :authorized, only: [:login_2FA, :upload_kyc_docs]
 
   def temp
-    user = User.find(params[:id])
-    render json: user
+    OtpMessageJob.perform_async('bob')
   end
 
   def create
-    user = User.new(create_user_params)
-    begin
-      token = encode_token({user_id: user.id})
-      user.save!
-      render json: {token: token, status: 200}
-    rescue ActiveRecord::RecordInvalid => e
-      render json: {error: user.errors.full_messages}
-    end
+    render json: CreateUser.call(params[:name], params[:email], params[:password], params[:phone_number])
   end
 
   def login
-    user = User.find_by(email: params[:email])
-    if user && user.authenticate(params[:password])
-      token = encode_token({user_id: user.id})
-      render json: {token: token, status: 200}
-    else
-      render json: {error: user.errors.full_messages}
-    end
+    render json: LoginUser.call(params[:email], params[:password])
   end
 
-  def otp_check(user, otp)
-    return user.authenticate_otp(otp)
+  # def otp_check(user, otp)
+  #   return user.authenticate_otp(otp)
+  # end
+
+  def get_user_id
+    auth_header = request.headers['Authorization']
+    if auth_header.blank?
+      render json: CustomError.call("not_logged_in", 404, "User is not logged in") 
+      return
+    end
+    token = auth_header.split(' ')[1]
+
+    GetUserFromToken.call(token)
   end
 
   def login_2FA
-    if otp_check(@user, params[:otp])
-      render json: {status: 200}
+    user_id = get_user_id
+
+    otp_status = CheckOtp.call(user_id, params[:otp])
+
+    if otp_status
+      render json: {status: 200, message: 'Correct otp'}
     else
-      render json: {error: 'Incorrect otp'}
+      render json: {status: 404, error: 'incorrect_otp'}
     end
   end
 
   def upload_kyc_docs
-    ActiveRecord::Base.transaction do
-      params = upload_kyc_params
-      @user.aadhaar_number = params[:aadhaar_number]
-      @user.aadhaar_url = params[:aadhaar_url]
-      @user.save!
-    end
+    user = User.find(get_user_id)
+    params = upload_kyc_params
+    user.aadhaar_number = params[:aadhaar_number]
+    user.aadhaar_url = params[:aadhaar_url]
+    user.save!
   end
 
   def verify_kyc
@@ -55,11 +55,6 @@ class UsersController < ApplicationController
   end
   
   private
-
-  def create_user_params
-    params.permit(:name, :email, :password, :phone_number)
-  end
-
   def upload_kyc_params
     params.permit(:aadhaar_number, :aadhaar_url)
   end
