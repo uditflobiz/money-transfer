@@ -1,6 +1,4 @@
 class UsersController < ApplicationController
-  # before_action :authorized, only: [:login_2FA, :upload_kyc_docs]
-
   def temp
     OtpMessageJob.perform_async('bob')
   end
@@ -13,31 +11,12 @@ class UsersController < ApplicationController
     render json: LoginUser.call(params[:email], params[:password])
   end
 
-  # def otp_check(user, otp)
-  #   return user.authenticate_otp(otp)
-  # end
-
-  def get_user_id
-    auth_header = request.headers['Authorization']
-    if auth_header.blank?
-      render json: CustomError.call("not_logged_in", 404, "User is not logged in") 
-      return
-    end
-    token = auth_header.split(' ')[1]
-
-    GetUserFromToken.call(token)
-  end
-
   def login_2FA
     user_id = get_user_id
-
     otp_status = CheckOtp.call(user_id, params[:otp])
+    raise OtpError if !otp_status
 
-    if otp_status
-      render json: {status: 200, message: 'Correct otp'}
-    else
-      render json: {status: 404, error: 'incorrect_otp'}
-    end
+    render json: {status: 200, message: 'Correct otp'}
   end
 
   def upload_kyc_docs
@@ -46,12 +25,14 @@ class UsersController < ApplicationController
     user.aadhaar_number = params[:aadhaar_number]
     user.aadhaar_url = params[:aadhaar_url]
     user.save!
+    render json: {status: 200, message: 'Kyc Docs Uploaded'}
   end
 
   def verify_kyc
     user = User.find(params[:user_id])
     user.kyc_completed = true
     user.save!
+    render json: {status: 200, message: 'Kyc Verified'}
   end
   
   private

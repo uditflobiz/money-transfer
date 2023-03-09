@@ -10,10 +10,16 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2023_03_01_093719) do
+ActiveRecord::Schema.define(version: 2023_03_09_071948) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "currencies", force: :cascade do |t|
+    t.string "currency"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
 
   create_table "transaction_histories", force: :cascade do |t|
     t.bigint "sender_wallet_id"
@@ -46,11 +52,12 @@ ActiveRecord::Schema.define(version: 2023_03_01_093719) do
 
   create_table "wallets", force: :cascade do |t|
     t.bigint "user_id"
-    t.string "currency"
+    t.bigint "currency_id"
     t.float "amount", default: 0.0
     t.datetime "deleted_at"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.index ["currency_id"], name: "index_wallets_on_currency_id"
     t.index ["user_id"], name: "index_wallets_on_user_id"
   end
 

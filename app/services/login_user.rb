@@ -10,7 +10,7 @@ class LoginUser < ApplicationService
       token = encode_token({user_id: user.id})
       {token: token, status: 200}
     else
-      CustomError.call("record_invalid", 404, "Please check Email and Password")
+      raise CustomError.new("Please check Email and Password")
     end
   end
 end

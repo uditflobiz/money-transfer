@@ -17,6 +17,8 @@ Rails.application.routes.draw do
 
   get "/user_transaction_history", to: "transaction_histories#get_transaction_history"
 
+  post "/add_currency", to: "currencies#create"
+
   #test
   get "/temp", to: "users#temp"
 end

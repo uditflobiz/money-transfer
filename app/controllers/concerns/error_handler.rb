@@ -17,31 +17,37 @@ module ErrorHandler
     rescue_from JWT::DecodeError do |e|
       render json: respond(:bearer_token_invalid, 404, e.to_s)
     end
+
+    rescue_from OtpError do |e|
+      render json: respond(:incorrect_otp, 404, e.to_s)
+    end
+
+    # rescue_from KycError do |e|
+    #   render json: respond(:kyc_not_completed, 404, e.to_s)
+    # end
   end
 end
 
 class CustomError < StandardError
-  attr_reader :status, :error, :message
+end
 
-  def initialize(_error=nil, _status=nil, _message=nil)
-    @error = _error || 422
-    @status = _status || :unprocessable_entity
-    @message = _message || 'Something went wrong'
-  end
-
-  def self.call(*args)
-    new(*args).fetch_json
-  end
-
-  def fetch_json
-    respond(@status, @error, @message)
+class OtpError < StandardError
+  def initialize
+    super("Otp is incorrect")
   end
 end
 
-def respond(_error, _status, _message)
+# class KycError < StandardError
+#   def initialize
+#     super("Kyc is not completed")
+#   end
+# end
+
+
+def respond(error, status, message)
   {
-    status: _status,
-    error: _error,
-    message: _message
+    status: status,
+    error: error,
+    message: message
   }
 end
