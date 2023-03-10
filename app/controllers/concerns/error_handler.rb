@@ -21,10 +21,6 @@ module ErrorHandler
     rescue_from OtpError do |e|
       render json: respond(:incorrect_otp, 404, e.to_s)
     end
-
-    # rescue_from KycError do |e|
-    #   render json: respond(:kyc_not_completed, 404, e.to_s)
-    # end
   end
 end
 
@@ -36,13 +32,6 @@ class OtpError < StandardError
     super("Otp is incorrect")
   end
 end
-
-# class KycError < StandardError
-#   def initialize
-#     super("Kyc is not completed")
-#   end
-# end
-
 
 def respond(error, status, message)
   {
