@@ -1,7 +1,4 @@
 class UsersController < ApplicationController
-  def temp
-    OtpMessageJob.perform_async('bob')
-  end
 
   def create
     render json: CreateUser.call(params[:name], params[:email], params[:password], params[:phone_number])

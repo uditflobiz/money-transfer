@@ -12,6 +12,7 @@ Rails.application.routes.draw do
   post "/update_kyc", to: "users#upload_kyc_docs"
   post "/verify_user_kyc", to: "users#verify_kyc"
 
+  post "/request_otp", to: "wallets#request_otp"
   post "/top_up", to: "wallets#top_up"
   post "/transfer_money", to: "wallets#transfer_money"
 
@@ -19,6 +20,4 @@ Rails.application.routes.draw do
 
   post "/add_currency", to: "currencies#create"
 
-  #test
-  get "/temp", to: "users#temp"
 end

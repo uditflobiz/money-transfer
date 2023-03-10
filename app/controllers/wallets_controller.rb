@@ -25,4 +25,10 @@ class WalletsController < ApplicationController
     TransferMoney.call(get_user_id, params[:receiver_user_id], params[:otp], params[:sender_currency], params[:receiver_currency], params[:amount])
     render json: {status: 200, message: 'Amounted transffered successfully'}
   end
+
+  def request_otp
+    user = User.find_by(id: get_user_id)
+    OtpMessageJob.perform_async("Your transaction OTP is #{user.otp_code}")
+    render json: {status: 200}
+  end
 end
