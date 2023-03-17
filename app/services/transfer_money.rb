@@ -11,7 +11,7 @@ class TransferMoney < ApplicationService
   def call
     ActiveRecord::Base.transaction do
       otp_status = CheckOtp.call(@sender_user_id, @otp)
-      raise OtpError if !otp_status
+      raise AuthorizationError.new("Otp is incorrect") if !otp_status
 
       sender = User.find_by(id: @sender_user_id)
       raise CustomError.new("sender's kyc is not completed") if !sender.kyc_completed
@@ -24,15 +24,15 @@ class TransferMoney < ApplicationService
 
       transaction_fee = 2
 
-      raise CustomError.new("Not enough balance in wallet") if(sender_wallet[:amount] - (@amount.to_f  + transaction_fee) < 0)
-      sender_wallet[:amount] = sender_wallet[:amount] - (@amount.to_f  + transaction_fee)
+      raise CustomError.new("Not enough balance in wallet") if(sender_wallet[:amount] - (@amount.to_d  + transaction_fee) < 0)
+      sender_wallet[:amount] = sender_wallet[:amount] - (@amount.to_d  + transaction_fee)
       sender_wallet.save!
 
-      receiving_amount = @amount.to_f * $redis.get("#{@sender_currency}##{@receiver_currency}").to_f
+      receiving_amount = @amount.to_d * $redis.get("#{@sender_currency}##{@receiver_currency}").to_d
       receiver_wallet[:amount] = receiver_wallet[:amount] + receiving_amount
       receiver_wallet.save!
       
-      TransactionHistory.create(receiver_wallet_id: receiver_wallet[:id], sender_wallet_id: sender_wallet[:id], amount_credited: receiving_amount, amount_debited: @amount.to_f, transaction_fee: transaction_fee, wallet_top_up: false)
+      TransactionHistory.create(receiver_wallet_id: receiver_wallet[:id], sender_wallet_id: sender_wallet[:id], amount_credited: receiving_amount, amount_debited: @amount.to_d, transaction_fee: transaction_fee, wallet_top_up: false)
     end
   end
 end

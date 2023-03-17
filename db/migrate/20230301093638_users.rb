@@ -7,7 +7,7 @@ class Users < ActiveRecord::Migration[6.0]
       t.string :phone_number
       t.string :aadhaar_number
       t.string :aadhaar_url
-      t.boolean :kyc_completed
+      t.boolean :kyc_completed, default: false
       t.string :otp_secret_key
       t.timestamp :deleted_at
       

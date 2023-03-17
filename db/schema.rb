@@ -24,9 +24,9 @@ ActiveRecord::Schema.define(version: 2023_03_09_071948) do
   create_table "transaction_histories", force: :cascade do |t|
     t.bigint "sender_wallet_id"
     t.bigint "receiver_wallet_id"
-    t.float "amount_debited"
-    t.float "amount_credited"
-    t.float "transaction_fee"
+    t.decimal "amount_debited", precision: 10, scale: 2
+    t.decimal "amount_credited", precision: 10, scale: 2
+    t.decimal "transaction_fee", precision: 10, scale: 2
     t.boolean "wallet_top_up"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
@@ -41,7 +41,7 @@ ActiveRecord::Schema.define(version: 2023_03_09_071948) do
     t.string "phone_number"
     t.string "aadhaar_number"
     t.string "aadhaar_url"
-    t.boolean "kyc_completed"
+    t.boolean "kyc_completed", default: false
     t.string "otp_secret_key"
     t.datetime "deleted_at"
     t.datetime "created_at", precision: 6, null: false
@@ -52,12 +52,11 @@ ActiveRecord::Schema.define(version: 2023_03_09_071948) do
 
   create_table "wallets", force: :cascade do |t|
     t.bigint "user_id"
-    t.bigint "currency_id"
-    t.float "amount", default: 0.0
+    t.integer "currency"
+    t.decimal "amount", precision: 10, scale: 2, default: "0.0"
     t.datetime "deleted_at"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.index ["currency_id"], name: "index_wallets_on_currency_id"
     t.index ["user_id"], name: "index_wallets_on_user_id"
   end
 

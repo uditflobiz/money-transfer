@@ -6,18 +6,24 @@ Sidekiq::Web.use ActionDispatch::Session::CookieStore, key: "_interslice_session
 Rails.application.routes.draw do
   mount Sidekiq::Web => "/sidekiq" 
 
-  post "/create", to: "users#create"
-  post "/login", to: "users#login"
-  post "/login_2FA", to: "users#login_2FA"
-  post "/update_kyc", to: "users#upload_kyc_docs"
-  post "/verify_user_kyc", to: "users#verify_kyc"
+  scope 'api' do
+    resources :users, only: [:create] do
+      post :login, on: :collection
+      post :login_2FA, on: :collection
+      post :upload_kyc_docs, on: :collection
+      post :verify_user_kyc, on: :collection
+    end
 
-  post "/request_otp", to: "wallets#request_otp"
-  post "/top_up", to: "wallets#top_up"
-  post "/transfer_money", to: "wallets#transfer_money"
+    resources :wallets do
+      post :request_otp, on: :collection
+      post :top_up, on: :collection
+      post :transfer_money, on: :collection
+    end
 
-  get "/user_transaction_history", to: "transaction_histories#get_transaction_history"
+    resources :transaction_histories, only: [:index]
+  end
 
-  post "/add_currency", to: "currencies#create"
+  # get "/user_transaction_history", to: "transaction_histories#get_transaction_history"
 
+  # post "/add_currency", to: "currencies#create"
 end

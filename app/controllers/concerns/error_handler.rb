@@ -18,8 +18,8 @@ module ErrorHandler
       render json: respond(:bearer_token_invalid, 404, e.to_s)
     end
 
-    rescue_from OtpError do |e|
-      render json: respond(:incorrect_otp, 404, e.to_s)
+    rescue_from AuthorizationError do |e|
+      render json: respond(e.message, 404, e.to_s)
     end
   end
 end
@@ -27,10 +27,7 @@ end
 class CustomError < StandardError
 end
 
-class OtpError < StandardError
-  def initialize
-    super("Otp is incorrect")
-  end
+class AuthorizationError < StandardError
 end
 
 def respond(error, status, message)

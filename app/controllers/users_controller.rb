@@ -1,4 +1,5 @@
 class UsersController < ApplicationController
+  before_action :get_user, only: [:login_2FA, :upload_kyc_docs]
 
   def create
     render json: CreateUser.call(params[:name], params[:email], params[:password], params[:phone_number])
@@ -9,23 +10,21 @@ class UsersController < ApplicationController
   end
 
   def login_2FA
-    user_id = get_user_id
-    otp_status = CheckOtp.call(user_id, params[:otp])
-    raise OtpError if !otp_status
+    otp_status = CheckOtp.call(current_user[:id], params[:otp])
+    raise AuthorizationError.new("Otp is incorrect") if !otp_status
 
     render json: {status: 200, message: 'Correct otp'}
   end
 
   def upload_kyc_docs
-    user = User.find(get_user_id)
     params = upload_kyc_params
-    user.aadhaar_number = params[:aadhaar_number]
-    user.aadhaar_url = params[:aadhaar_url]
-    user.save!
+    current_user.aadhaar_number = params[:aadhaar_number]
+    current_user.aadhaar_url = params[:aadhaar_url]
+    current_user.save!
     render json: {status: 200, message: 'Kyc Docs Uploaded'}
   end
 
-  def verify_kyc
+  def verify_user_kyc
     user = User.find(params[:user_id])
     user.kyc_completed = true
     user.save!

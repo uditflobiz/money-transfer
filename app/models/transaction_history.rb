@@ -1,4 +1,5 @@
 class TransactionHistory < ApplicationRecord
+  
   before_destroy :prevent_deletion
   before_update :prevent_updation
 
